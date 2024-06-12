@@ -4,14 +4,19 @@
 
 {%block content%}
 <div class="container mt-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{% url 'expenditures:index' %}">Expenditures</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">Add Expenditure</li>
-        </ol>
-    </nav>
+    <div class="row">
+        <div class="col-md-10">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'expenditures:index' %}">Expenditures</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit Expenditure</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+   
 
     <div class="card shadow-sm">
         <div class="card-header">
@@ -23,16 +28,16 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="amount">Amount</label>
-                    <input type="number" name="amount" class="form-control form-control-sm" id="amount" required>
+                    <input type="number" name="amount" class="form-control form-control-sm" id="amount" value="{{expenditure.amount}}" required>
                 </div>
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <input name="description" type="text" class="form-control form-control-sm" id="description">
+                    <input name="description" type="text" class="form-control form-control-sm" value={{expenditure.description}} id="description">
                 </div>
                 <div class="form-group">
                     <label for="category">Category</label>
                     <select name="category" class="form-control my-2" id="category" required>
-                        <option value="" disabled selected>Select a category</option>
+                        <option value="{{expenditure.category}}" selected>{{expenditure.category}}</option>
                         {% for value, label in categories %}
                             <option value="{{ value }}">{{ label }}</option>
                         {% endfor %}
@@ -41,7 +46,7 @@
                 
                 <div class="form-group">
                     <label for="date">Date</label>
-                    <input type="date" name="date" class="form-control form-control-sm" id="date" required>
+                    <input type="date" name="date" class="form-control form-control-sm" id="date" value={{expenditure.date}} required>
                 </div>
                 <div class="form-group text-right">
                     <input type="submit" value="Submit" class="btn btn-primary my-2 px-4 py-2">

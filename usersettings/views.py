@@ -24,6 +24,11 @@ def preferences(request):
     #print(currency_data)
 
     if request.method!='POST':
+        context = {
+        "currencies":currency_data,
+        "user_preferences":user_preferences,
+        }
+       
         return render(request,'user-settings/preferences.html',context)
     
     elif request.POST :

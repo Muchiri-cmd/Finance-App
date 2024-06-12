@@ -3,8 +3,61 @@
 
 {%block content%}
     <h1>Expenditures Index</h1>
+  
+   
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                      <li class="breadcrumb-item">
+                        <a href="">Expenditures</a>
+                      </li>
+                      <li class="breadcrumb-item active" aria-current="page">My Expenditure</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'expenditures:add-expense' %}" class="btn btn-primary">Add Expense</a>
+            </div>
+        </div>
+
+        <div class="container mt-4">
+            {% if expenditures %}
+            <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Amount (Currency)</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expenditure in expenditures %}
+                    <tr>
+                        <td>{{ expenditure.amount }}</td>
+                        <td>{{ expenditure.category }}</td>
+                        <td>{{ expenditure.description }}</td>
+                        <td>{{ expenditure.date }}</td>
+
+                        <td><a href="{% url 'expenditures:edit-expenditure' expenditure.id %}" class="btn btn-secondary btn-sm">Edit</a></td>
+                        <td class="col-md-2">
+                            <a href="{% url 'expenditures:delete-expenditure' expenditure.id %}" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No expenditures found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% endif %}
+        </div>
+    </div>
 
     {% include "partials/messages.html" %}
-
-
+  
 {%endblock content%}
