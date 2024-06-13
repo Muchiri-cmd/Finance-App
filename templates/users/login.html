@@ -27,8 +27,20 @@
                         <input type="submit" value="Login" class="btn btn-primary btn-block submit-btn">
                     </div>
                 </form>
-
+                <div>
+                    <span>  
+                        Don't have an  account ? 
+                        <a href="{% url 'users:signup' %}">SignUp</a>
+                    </span>
+                
+                    <span class="float-end">  
+                        Forgot Password ? 
+                        <a href="{% url 'users:forgot-password' %}">Reset Password</a>
+                    </span>
+                   
+                </div>
             </div>
+
         </div>
     </div>
 </div>

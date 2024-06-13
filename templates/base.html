@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Budgeting App{% block title %} {% endblock %}</title>
+    <title>Finance App{% block title %} {% endblock %}</title>
     <!-- Bootstrap core CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Custom styles for this template -->
@@ -13,7 +13,7 @@
   </head>
   <body>
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Finance App</a>
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{% url 'expenditures:index' %}">Finance App</a>
       <ul class="navbar-nav px-3" style="display:flex; flex-direction:row; align-items:center;">
         <li class="nav-item text-nowrap">
             <span class="nav-link" style="margin-right:20px;">

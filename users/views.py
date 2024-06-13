@@ -12,6 +12,21 @@ from django.utils.http import urlsafe_base64_decode,urlsafe_base64_encode
 from django.contrib.sites.shortcuts import get_current_site
 from .utils import token_generator
 from django.contrib import auth
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+import threading
+
+class EmailThread(threading.Thread):
+    def __init__(self, email):
+       self.email = email
+       threading.Thread.__init__(self)
+
+    def run(self):
+        self.email.send(fail_silently=False)
 
 # Create your views here.
 class SignUpView(View):
@@ -66,8 +81,7 @@ class SignUpView(View):
                     #reply_to=["another@example.com"],
                     headers={"Message-ID": "foo"},
                 )
-        
-        email.send(fail_silently=False)
+        EmailThread(email).start()
         messages.success(request,'Account successfully created')
 
      
@@ -155,3 +169,99 @@ class EmailValidation(View):
             return JsonResponse({'error':'email is already registered.'})
         return JsonResponse({'email_valid':True})
     
+class ForgotPassword(View):
+    def get(self,request):
+        
+        return render(request,'users/forgot-password.html')
+    
+    def post(self,request):
+        context = {
+            'values' : request.POST,
+        }
+        user_email= request.POST['email']
+
+        if not validate_email(user_email):
+            messages.error(request,'Kindly enter a valid email')
+            return render(request,'users/forgot-password.html',context)
+    
+       
+        current_site = get_current_site(request)
+
+        user = User.objects.filter(email=user_email)
+
+        if user.exists():
+            pass
+
+        messages.success(request,'We have sent you an email to reset password')
+        
+       
+        link = reverse('users:reset-password',kwargs={'uidb64':urlsafe_base64_encode(force_bytes(user[0].pk)),
+                                                      'token':PasswordResetTokenGenerator().make_token(user[0])})
+        
+        reset_url='http://'+current_site.domain+link
+
+        email_subject = 'Password Reset'
+        email_body = f"Hi there, Please click the link below to reset your password\n"+ reset_url
+
+        email = EmailMessage(
+            email_subject,
+            email_body,
+            "noreply@semycolon.com",
+            [user_email],
+        )
+        EmailThread(email).start()
+        
+        return render(request,'users/forgot-password.html',context) 
+
+class PasswordReset(View):
+    def get(self,request,uidb64,token):
+
+        context = {
+            "uidb64":uidb64,
+            "token":token,
+        }
+        return render(request,'users/reset-password.html',context)
+    
+       
+    def post(self, request, uidb64, token):
+        context = {
+            "uidb64": uidb64,
+            "token": token,
+        }
+
+        logger.debug(f"uidb64: {uidb64}, token: {token}")
+
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+
+        if password != password2:
+            messages.error(request, "Passwords don't match")
+            return render(request, 'users/reset-password.html', context)
+
+        if len(password) < 8:
+            messages.error(request, "Password should be at least 8 characters")
+            return render(request, 'users/reset-password.html', context)
+
+        try:
+            # Decode the user ID from the uidb64 string
+            user_id = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=user_id)
+            print(user.username)
+
+            # Check if the token is valid
+            if not PasswordResetTokenGenerator.check_token(user, token):
+                messages.error(request, "The reset link is invalid.")
+                return render(request, 'users/reset-password.html', context)
+            # Set and save the new password
+            user.set_password(password)
+            user.save()
+
+            messages.success(request, 'Password Reset Successfully')
+            return redirect('users:login')
+        
+        except Exception as e:
+            logger.error(f"Error occurred: {str(e)}")
+            messages.info(request, 'Something went wrong. Try again')
+            return render(request, 'users/reset-password.html', context)
+
+       
