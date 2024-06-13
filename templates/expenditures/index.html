@@ -1,63 +1,156 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% load static %} {%block content%}
+<h1>Expenditures Index</h1>
 
-{%block content%}
-    <h1>Expenditures Index</h1>
-  
-   
-    <div class="container">
-        <div class="row">
-            <div class="col-md-10">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                      <li class="breadcrumb-item">
-                        <a href="">Expenditures</a>
-                      </li>
-                      <li class="breadcrumb-item active" aria-current="page">My Expenditure</li>
-                    </ol>
-                </nav>
-            </div>
-            <div class="col-md-2">
-                <a href="{% url 'expenditures:add-expense' %}" class="btn btn-primary">Add Expense</a>
-            </div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-10">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="">Expenditures</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            My Expenditure
+          </li>
+        </ol>
+      </nav>
+    </div>
+    <div class="col-md-2">
+      <a href="{% url 'expenditures:add-expense' %}" class="btn btn-primary"
+        >Add Expense</a
+      >
+    </div>
+  </div>
+
+  <div class="container mt-4">
+    {% include 'partials/messages.html' %}
+    <div class="row">
+      <div class="col-md-8"></div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <div class="form-control">
+            <input
+              type="text"
+              class="form-control"
+              id="searchinput"
+              placeholder="search"
+            />
+          </div>
         </div>
-
-        <div class="container mt-4">
-            {% if expenditures %}
-            <table class="table table-striped table-hover">
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Amount (Currency)</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for expenditure in expenditures %}
-                    <tr>
-                        <td>{{ expenditure.amount }}</td>
-                        <td>{{ expenditure.category }}</td>
-                        <td>{{ expenditure.description }}</td>
-                        <td>{{ expenditure.date }}</td>
-
-                        <td><a href="{% url 'expenditures:edit-expenditure' expenditure.id %}" class="btn btn-secondary btn-sm">Edit</a></td>
-                        <td class="col-md-2">
-                            <a href="{% url 'expenditures:delete-expenditure' expenditure.id %}" class="btn btn-danger btn-sm">Delete</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center">No expenditures found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            {% endif %}
-        </div>
+      </div>
     </div>
 
-    {% include "partials/messages.html" %}
-  
+    {% if expenditures %}
+    <div class="expenditures-table">
+      <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Amount in {{currency}}</th>
+            <th scope="col">Category</th>
+            <th scope="col">Description</th>
+            <th scope="col">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for expenditure in page_object %}
+          <tr>
+            <td>{{ expenditure.amount }}</td>
+            <td>{{ expenditure.category }}</td>
+            <td>{{ expenditure.description }}</td>
+            <td>{{ expenditure.date }}</td>
+
+            <td>
+              <a
+                href="{% url 'expenditures:edit-expenditure' expenditure.id %}"
+                class="btn btn-secondary btn-sm"
+                >Edit</a
+              >
+            </td>
+            <td class="col-md-2">
+              <a
+                href="{% url 'expenditures:delete-expenditure' expenditure.id %}"
+                class="btn btn-danger btn-sm"
+                >Delete</a
+              >
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="text-center">No expenditures found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="search-output" style="display: none">
+      <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Amount in {{currency}}</th>
+            <th scope="col">Category</th>
+            <th scope="col">Description</th>
+            <th scope="col">Date</th>
+          </tr>
+        </thead>
+        <tbody class="search-table"></tbody>
+      </table>
+    </div>
+
+    <div class="pagination-div">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          Showing page {{page_object.number}} of
+          {{page_object.paginator.num_pages}}
+        </div>
+        <ul class="pagination mb-0">
+          {% if page_object.has_previous %}
+          <li
+            class="page-item{% if page_object.number == 1 %} active{% endif %}"
+          >
+            <a class="page-link" href="?page=1" aria-label="First">
+              <span aria-hidden="true">&laquo; 1</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="?page={{ page_object.previous_page_number }}"
+              aria-label="Previous"
+            >
+              <span aria-hidden="true">Previous</span>
+            </a>
+          </li>
+          {% endif %} {% if page_object.has_next %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="?page={{ page_object.next_page_number }}"
+              aria-label="Next"
+            >
+              <span aria-hidden="true">Next</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="?page={{ page_object.paginator.num_pages }}"
+              aria-label="Last"
+            >
+              <span aria-hidden="true"
+                >{{ page_object.paginator.num_pages }} &raquo;</span
+              >
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+
+    {% endif %}
+  </div>
+</div>
+
+<script src="{% static 'js/expenditures-index.js' %}"></script>
+
 {%endblock content%}

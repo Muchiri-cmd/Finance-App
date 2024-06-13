@@ -46,7 +46,7 @@
                 
                 <div class="form-group">
                     <label for="date">Date</label>
-                    <input type="date" name="date" class="form-control form-control-sm" id="date" value={{expenditure.date}} required>
+                    <input type="date" name="date" class="form-control form-control-sm" id="date" value={{expenditure.date | date:'Y-m-d'}} required>
                 </div>
                 <div class="form-group text-right">
                     <input type="submit" value="Submit" class="btn btn-primary my-2 px-4 py-2">
