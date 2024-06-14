@@ -6,7 +6,7 @@
       <li class="nav-item">
         <a class="nav-link active" href="#">
           <span ></span>
-          Dashboard <span class="sr-only">(current)</span>
+          Dashboard <span class="sr-only"></span>
         </a>
       </li>
       <li class="nav-item">
@@ -18,7 +18,7 @@
       <li class="nav-item">
         <a class="nav-link" href="{% url 'income:index' %}">
           <span></span>
-          Money/ Resources
+          Income
         </a>
       </li>
     </ul>
@@ -31,15 +31,15 @@
     </h6>
     <ul class="nav flex-column mb-2">
       <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="{% url 'expenditures:summary-view' %}">
           <span></span>
           Expenditures Summary
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="{% url 'income:summary-view' %}">
           <span></span>
-          Resources(Money) Summary
+          Income Summary
         </a>
       </li>
     </ul>
@@ -55,12 +55,6 @@
         <a class="nav-link" href="{% url 'usersettings:preferences' %}">
           <span></span>
           General settings
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">
-          <span></span>
-            Account Settings
         </a>
       </li>
     </ul>

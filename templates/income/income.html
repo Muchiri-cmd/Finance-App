@@ -25,8 +25,12 @@
   <div class="container mt-4">
     {% include 'partials/messages.html' %}
     <div class="row">
-      <div class="col-md-8"></div>
+      <div class="col-md-8">
+       
+      </div>
       <div class="col-md-4">
+        <a href="{% url 'income:export-csv' %}">Export CSV</a>
+        <a href="{% url 'income:export-xls' %}">Export Excel</a>
         <div class="form-group">
           <div class="form-control">
             <input
@@ -148,6 +152,19 @@
     </div>
 
     {% endif %}
+    
+    <div class="row chart">
+      <div class="col-md-8">
+       <canvas id="myChart"></canvas>
+          </div><div class="col-md-4">
+          </div>
+      
+       </div>
+      </div>
+  
+  
+    <script src='{% static 'js/charts.js' %}'></script>
+  
   </div>
 </div>
 

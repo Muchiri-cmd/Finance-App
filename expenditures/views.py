@@ -8,6 +8,11 @@ import json
 from django.http import JsonResponse
 from django.urls import reverse
 from usersettings.models import Settings
+import csv
+import xlwt
+from datetime import date
+import datetime
+
 
 # Create your views here.
 @login_required(login_url='/users/login')
@@ -110,3 +115,82 @@ def search_records(request):
         return JsonResponse(data, safe=False)
     else:
         return HttpResponse(status=405)  # Method Not Allowed
+
+def expenditures_summary(request):
+    todays_date = date.today()
+    six_months_ago_date =  six_months_ago_date = todays_date - datetime.timedelta(days=30*6)
+
+    six_months_ago_date_str = six_months_ago_date.strftime('%Y-%m-%d')
+    todays_date_str = todays_date.strftime('%Y-%m-%d')
+
+    expenditures = Expenditures.objects.filter(date__gte=six_months_ago_date_str,date__lte=todays_date_str,user=request.user)
+
+    finalreport = {}
+
+    def get_category(expenditure):
+        return expenditure.category
+    
+    category_list = list(set(map(get_category,expenditures)))
+
+    def get_category_expenditure(category):
+        amount=0
+        filtered_by_category = expenditures.filter(category=category)
+
+        for item in filtered_by_category:
+            amount += item.amount
+
+        return amount
+
+    for i in expenditures:
+        for j in category_list:
+            finalreport[j] = get_category_expenditure(j)
+
+    
+    return JsonResponse({'final_report':finalreport},safe=False)
+
+def summary_view(request):
+    return render(request,'expenditures/summary.html')
+
+def export_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=Expenditures_' + str(datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')) + '.csv'
+
+    # Create a CSV writer object
+    writer = csv.writer(response)
+
+    # Write the header row
+    writer.writerow(['Amount', 'Description', 'Category', 'Date'])
+
+    # Query the expenditures for the current user
+    expenditures = Expenditures.objects.filter(user=request.user)
+
+    # Write data rows
+    for expenditure in expenditures:
+        writer.writerow([expenditure.amount, expenditure.description, expenditure.category, expenditure.date])
+
+    return response
+
+def export_excel(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=Expenditures_' + str(datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')) + '.xls'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws= wb.add_sheet('Expenditures')
+    row_num=0
+    font_style=xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['Amount', 'Description', 'Category', 'Date']
+    for col in range(len(columns)):
+        ws.write(row_num,col,columns[col],font_style)
+
+    rows = Expenditures.objects.filter(user=request.user).values_list('amount', 'description', 'category', 'date')
+
+    for row in rows:
+        row_num+=1
+
+        for col in range(len(row)):
+            ws.write(row_num,col,str(row[col]),font_style)
+
+    wb.save(response)
+
+    return response

@@ -3,6 +3,7 @@ const paginationDiv = document.querySelector('.pagination-div');
 const resultsOutput = document.querySelector('.search-output');
 const expendituresTable = document.querySelector('.expenditures-table');
 const searchTable = document.querySelector('.search-table');
+const chartSection = document.querySelector('.chart')
 
 searchInput.addEventListener('keyup', (e) => {
     const searchval = e.target.value;
@@ -17,9 +18,10 @@ searchInput.addEventListener('keyup', (e) => {
             method: "POST",
         }).then((res) => res.json())
             .then((data) => {
-                console.log("data", data);
+                //console.log("data", data);
                 expendituresTable.style.display = 'none';
                 paginationDiv.style.display = 'none';
+                chartSection.style.display = 'none'
                 resultsOutput.style.display = 'block';
 
                 if (data.length === 0) {
@@ -54,6 +56,7 @@ searchInput.addEventListener('keyup', (e) => {
     } else {
         expendituresTable.style.display = 'block';
         paginationDiv.style.display = 'block';
+        chartSection.style.display = 'block'
         resultsOutput.style.display = 'none';
         resultsOutput.innerHTML = '';
     }
